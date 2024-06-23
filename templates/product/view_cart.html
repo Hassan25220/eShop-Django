@@ -1,0 +1,70 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="section-content padding-y bg">
+    <div class="container">
+        {% if cart and cart.items.exists %}
+            <div class="card">
+                <table class="table table-borderless table-shopping-cart">
+                    <thead class="text-muted">
+                        <tr class="small text-uppercase">
+                            <th scope="col">Product</th>
+                            <th scope="col" width="120">Quantity</th>
+                            <th scope="col" width="150">Price</th>
+                            <th scope="col" class="text-right" width="130">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart.items.all %}
+                            <tr>
+                                <td>
+                                    <figure class="itemside align-items-center">
+                                        <div class="aside"><img src="{{ item.product.product_images.first.image.url }}" class="img-sm"></div>
+                                        <figcaption class="info">
+                                            <a href="#" class="title text-dark">{{ item.product.product_name }}</a>
+                                            <p class="text-muted small">Size: {{ item.size_variant.size_name }}</p>
+                                        </figcaption>
+                                    </figure>
+                                </td>
+                                <td>
+                                    <form action="{% url 'update_cart' item.id %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="decrement">
+                                        <button type="submit" class="btn btn-light btn-sm">−</button>
+                                    </form>
+                                    {{ item.quantity }}
+                                    <form action="{% url 'update_cart' item.id %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="increment">
+                                        <button type="submit" class="btn btn-light btn-sm">+</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <div class="price-wrap">
+                                        <var class="price">${{ item.get_total_price }}</var>
+                                    </div>
+                                </td>
+                                <td class="text-right">
+                                    <form action="{% url 'update_cart' item.id %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="remove">
+                                        <button type="submit" class="btn btn-danger">Remove</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="card">
+                <div class="card-body">
+                    <h5>Your cart is empty.</h5>
+                    <a href="{% url 'product_listing' %}" class="btn btn-primary">Continue Shopping</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
